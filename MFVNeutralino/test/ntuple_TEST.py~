@@ -2,7 +2,6 @@
 
 from JMTucker.MFVNeutralino.NtupleCommon import *
 
-<<<<<<< HEAD
 import pandas as pd
 
 df = pd.read_csv("Higgs.txt", sep=" ", header=None)
@@ -12,11 +11,6 @@ settings = NtupleSettings()
 settings.is_mc = True
 settings.is_miniaod = True
 
-=======
-settings = NtupleSettings()
-settings.is_mc = True
-settings.is_miniaod = True
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
 settings.run_n_tk_seeds = False
 settings.minitree_only = False
 settings.prepare_vis = False
@@ -27,35 +21,21 @@ if use_btag_triggers :
 else :
     settings.event_filter = 'jets only'
 
-<<<<<<< HEAD
 process = ntuple_process(settings)
 
 
-for i in range(2):
-    test_name = list1[i]
-    output_name = 'ntuple_' + test_name + '.root'
-    print(output_name)
+test_name = 'VELOSO'
+output_name = 'ntuple_' + test_name + '.root'
+print(output_name)
 
-    process.out.fileName = output_name
-    dataset = 'miniaod' if settings.is_miniaod else 'main'
-
-    sample_files(process, 'mfv_HtoLLPto4j_tau1mm_M1000_450_2017', dataset, 1)
-    max_events(process, 1000)
-
-    cmssw_from_argv(process)
-=======
-# see readme for randpars
-settings.randpars_filter = False
-# if want to test local : 
-#settings.randpars_filter = 'randpar HToSSTodddd M07_ct0p05-'
-
-
-process = ntuple_process(settings)
+process.out.fileName = output_name
 dataset = 'miniaod' if settings.is_miniaod else 'main'
-sample_files(process, 'mfv_neu_tau001000um_M1200_2017', dataset, 1)
-max_events(process, 100)
+
+sample_files(process, 'HeavyHiggsToLLPTo4mu_mH_800_mX_80_ctau_1_2017_privateMC_MINI_v5_generationHH', dataset, 1)
+#sample_files(process, 'mfv_HtoLLPto4j_tau1mm_M1000_450_2017', dataset, 1)
+max_events(process, 1000)
+
 cmssw_from_argv(process)
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
 
 
 if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
@@ -64,7 +44,6 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
     if use_btag_triggers :
         samples = pick_samples(dataset, qcd=True, ttbar=False, all_signal=not settings.run_n_tk_seeds, data=False, bjet=True) # no data currently; no sliced ttbar since inclusive is used
     else :
-<<<<<<< HEAD
         samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=True, mfv_HtoLLPto4b=True)
 
         set_splitting(samples, dataset, 'ntuple', data_json=json_path('ana_2017p8.json'), limit_ttbar=True)
@@ -73,13 +52,3 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
         ms.common.pset_modifier = chain_modifiers(is_mc_modifier, era_modifier, npu_filter_modifier(settings.is_miniaod), signals_no_event_filter_modifier)
         ms.condor.stageout_files = 'all'
         ms.submit(samples)
-=======
-        samples = pick_samples(dataset, qcd=False, ttbar=False, data=False, all_signal=not settings.run_n_tk_seeds)
-        
-    set_splitting(samples, dataset, 'ntuple', data_json=json_path('ana_2017p8.json'), limit_ttbar=True)
-
-    ms = MetaSubmitter(settings.batch_name(), dataset=dataset)
-    ms.common.pset_modifier = chain_modifiers(is_mc_modifier, era_modifier, npu_filter_modifier(settings.is_miniaod), signals_no_event_filter_modifier, signal_uses_random_pars_modifier)
-    ms.condor.stageout_files = 'all'
-    ms.submit(samples)
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e

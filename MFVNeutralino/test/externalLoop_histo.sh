@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+
+
+for line in `cat ntuplesHiggs.txt`; do
+    echo $line
+    sed 's/INPUTNAME/'$line'/' histos_TEMPLATE.py > histos_TEST.py
+    #sed 's/OUTPUTNAME/'$line'/' histos_TEST.py > histos_TEST.py
+    #cmsRun histos_TEST.py
+done
+
+#sed 's/CAETANO/mfv_HtoLLPto4j_tau1mm_M1000_450_2017/' ntuple_TEMPLATE.py > ntuple_TEST.py
+#cmsRun ntuple_TEST.py

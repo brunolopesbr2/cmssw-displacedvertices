@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+mkdir output
+
+for file in `cat files_stop.txt`; do
+    echo 'Now making histos from '$file
+    ./looptrees.exe /eos/user/j/jreicher/copyFromFNAL/forBruno/$file output/$file 5
+done

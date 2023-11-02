@@ -11,21 +11,7 @@ const bool prints = false;
 
 TH1D* h_nvtx = 0;
 TH1D* h_dbv = 0;
-<<<<<<< HEAD
-TH1D* h_dbv_2 = 0;
-TH1D* h_dbv_any = 0;
 TH1D* h_dvv = 0;
-TH1D* h_ntk_1 = 0;
-TH1D* h_ntk_2 = 0;
-TH1D* h_ntk_any = 0;
-TH1D* h_cphivv = 0;
-TH1D* h_phivv = 0;
-TH1D* h_bs2derr = 0;
-TH2D* dbv_dvv = 0;
-
-=======
-TH1D* h_dvv = 0;
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
 
 // analyze method is a callback passed to MiniNtuple::loop from main that is called once per tree entry
 bool analyze(long long j, long long je, const mfv::MiniNtuple& nt) {
@@ -64,31 +50,11 @@ bool analyze(long long j, long long je, const mfv::MiniNtuple& nt) {
     nvtx += int(nt.nvtx) - 2;
   h_nvtx->Fill(nvtx, w);
 
-<<<<<<< HEAD
-  //Separate events per number of vertices
-  if (dbvs.size() == 1){
-    h_dbv->Fill(dbvs[0], w);
-    h_ntk_1->Fill(nt.ntk0, w);
-  }
-  if (dbvs.size() == 2){
-    h_dbv_2->Fill(dbvs[0], w);
-    h_dvv->Fill(hypot(nt.x0 - nt.x1, nt.y0 - nt.y1), w);
-    h_ntk_2->Fill(nt.ntk0, w);
-    dbv_dvv->Fill(dbvs[0], hypot(nt.x0 - nt.x1, nt.y0 - nt.y1), w);
-    h_cphivv->Fill((nt.x0*nt.x1 + nt.y0*nt.y1)/(dbvs[0]*dbvs[1]), w);
-    h_phivv->Fill(acos((nt.x0*nt.x1 + nt.y0*nt.y1)/(dbvs[0]*dbvs[1])), w);
-    h_bs2derr->Fill(nt.bs2derr0, w);
-  }
-  //That's for any event
-  h_dbv_any->Fill(dbvs[0], w);
-  h_ntk_any->Fill(nt.ntk0, w);
-=======
   if (dbvs.size() == 1)
     h_dbv->Fill(dbvs[0], w);
   else if (dbvs.size() == 2)
     h_dvv->Fill(hypot(nt.x0 - nt.x1, nt.y0 - nt.y1), w);
 
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
   return true;
 }
 
@@ -123,21 +89,7 @@ int main(int argc, char** argv) {
   // book hists
   h_nvtx = new TH1D("h_nvtx", ";# of vertices;Events", 10, 0, 10);
   h_dbv = new TH1D("h_dbv", ";d_{BV} (cm);Events/20 #mum", 1250, 0, 2.5);
-<<<<<<< HEAD
-  h_dbv_2 = new TH1D("h_dbv_2", ";d_{BV} (cm) for 2-vtx events;Events/20 #mum", 1250, 0, 2.5);  
-  h_dbv_any = new TH1D("h_dbv_any", ";d_{BV} (cm) for any event;Events/20 #mum", 1250, 0, 2.5); 
   h_dvv = new TH1D("h_dvv", ";d_{VV} (cm);Events/20 #mum", 2500, 0, 5.);
-  h_ntk_1 = new TH1D("h_ntk_1", ";# of tracks (1 vtx); Events", 40, -0.5, 39.5);
-  h_ntk_2 = new TH1D("h_ntk_2", ";# of tracks (2 vtx); Events", 40, -0.5, 39.5);
-  h_ntk_any = new TH1D("h_ntk_any", ";# of tracks (any vtx); Events", 40, -0.5, 39.5);
-  h_cphivv = new TH1D("h_cphivv", ";cos#phi_{VV}; Events", 100, -1, 1);
-  h_phivv = new TH1D("h_phivv", ";#phi_{VV}; Events", 100, 0, 3.142);
-  h_bs2derr = new TH1D("h_bs2derr", ";bs2derr; Events", 100, 0, 0.003);
-  dbv_dvv = new TH2D("dbv_dvv", "; d_{BV} (cm); d_{VV} (cm)", 2500, 0, 5., 2500, 0, 5.);
-
-=======
-  h_dvv = new TH1D("h_dvv", ";d_{VV} (cm);Events/20 #mum", 2500, 0, 5.);
->>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
 
   const char* tree_path =
     ntk == 3 ? "mfvMiniTreeNtk3/t" :

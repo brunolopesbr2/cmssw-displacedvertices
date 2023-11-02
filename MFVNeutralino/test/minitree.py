@@ -24,7 +24,12 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
         samples = pick_samples(dataset, qcd=True, ttbar=False, all_signal=True, data=False, bjet=True) # no data currently; no sliced ttbar since inclusive is used
         pset_modifier = chain_modifiers(is_mc_modifier, per_sample_pileup_weights_modifier())
     else :
+<<<<<<< HEAD
+        #samples = pick_samples(dataset)
+        samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=True, mfv_HtoLLPto4b=False)
+=======
         samples = pick_samples(dataset)
+>>>>>>> 573b0a37df38c75a684a3e0cba1eca76e521580e
         pset_modifier = chain_modifiers(is_mc_modifier, per_sample_pileup_weights_modifier())
     set_splitting(samples, dataset, 'minitree', data_json=json_path('ana_2017p8.json'))
 

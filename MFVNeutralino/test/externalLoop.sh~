@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+
+for line in `cat pastas.txt`; do
+    echo $line
+    sed 's/CAETANO/'$line'/' ntuple_TEMPLATE.py > ntuple_TEST.py
+done
+
+#sed 's/CAETANO/mfv_HtoLLPto4j_tau1mm_M1000_450_2017/' ntuple_TEMPLATE.py > ntuple_TEST.py
+#cmsRun ntuple_TEST.py
