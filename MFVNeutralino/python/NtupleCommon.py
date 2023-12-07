@@ -24,7 +24,9 @@ def run_n_tk_seeds(process, mode, settings, output_commands):
                 output_commands += ['keep MFVVertexAuxs_mfvVerticesAux%s_*_*' % ex]
 
 def prepare_vis(process, mode, settings, output_commands):
+    print("I'm on prepare_vis")
     if mode:
+        print("entered the if mode")
         process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
         process.p *= process.mfvSelectedVerticesSeq
 
@@ -33,6 +35,7 @@ def prepare_vis(process, mode, settings, output_commands):
             x.produce_tracks = True
             x.vertex_src = 'mfvVertices'
 
+        print("about to load the process")
         process.load('JMTucker.MFVNeutralino.VertexRefitter_cfi')
         process.mfvVertexRefitsDrop0 = process.mfvVertexRefits.clone(n_tracks_to_drop = 0)
         process.mfvVertexRefitsDrop2 = process.mfvVertexRefits.clone(n_tracks_to_drop = 2)
@@ -81,9 +84,9 @@ def minitree_only(process, mode, settings, output_commands):
         process.TFileService.fileName = 'minintuple.root'
 
 def event_filter(process, mode, settings, output_commands, **kwargs):
-    if mode:
+    if mode[0] or mode[1]:
         from JMTucker.MFVNeutralino.EventFilter import setup_event_filter
-        setup_event_filter(process, input_is_miniaod=settings.is_miniaod, mode=mode, **kwargs)
+        setup_event_filter(process, input_is_miniaod=settings.is_miniaod, mode=mode[0], rp_mode=mode[1], **kwargs)
 
 ########################################################################
 
@@ -97,6 +100,7 @@ class NtupleSettings(CMSSWSettings):
         self.keep_all = False
         self.keep_gen = False
         self.event_filter = True
+        self.randpars_filter = False
 
     @property
     def version(self):
@@ -204,7 +208,7 @@ def aod_ntuple_process(settings):
     mods = [
         (prepare_vis,    settings.prepare_vis),
         (run_n_tk_seeds, settings.run_n_tk_seeds),
-        (event_filter,   settings.event_filter),
+        (event_filter,   settings.event_filter, settings.randpars_filter),
         (minitree_only,  settings.minitree_only),
         ]
     for modifier, mode in mods:
@@ -224,6 +228,7 @@ def miniaod_ntuple_process(settings):
     settings.normalize()
     assert settings.is_miniaod
 
+    print("assert passed!")
     process = basic_process('Ntuple')
     registration_warnings(process)
     report_every(process, 1000000)
@@ -231,7 +236,8 @@ def miniaod_ntuple_process(settings):
     random_service(process, {'mfvVertexTracks': 1222})
     tfileservice(process, 'vertex_histos.root')
     output_file(process, 'ntuple.root', [])
-
+    
+    print("about to load stuff")
     process.load('PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi')
     process.load('PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi')
     process.load('PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi')
@@ -248,6 +254,7 @@ def miniaod_ntuple_process(settings):
     process.load('JMTucker.MFVNeutralino.TriggerFloats_cff')
     process.load('JMTucker.MFVNeutralino.EventProducer_cfi')
 
+    print("loaded!")
     process.goodOfflinePrimaryVertices.input_is_miniaod = True
     process.selectedPatJets.src = 'updatedJetsMiniAOD'
     process.selectedPatMuons.src = 'slimmedMuons'
@@ -255,7 +262,8 @@ def miniaod_ntuple_process(settings):
     process.selectedPatJets.cut = process.jtupleParams.jetCut
     #process.selectedPatMuons.cut = '' # process.jtupleParams.muonCut
     #process.selectedPatElectrons.cut = '' # process.jtupleParams.electronCut
-
+    
+    print("cuts set")
     process.mfvGenParticles.gen_particles_src = 'prunedGenParticles'
     process.mfvGenParticles.last_flag_check = False
 
@@ -270,6 +278,7 @@ def miniaod_ntuple_process(settings):
     process.mfvEvent.pileup_info_src = 'slimmedAddPileupInfo'
     process.mfvEvent.met_src = 'slimmedMETs'
 
+    print("about to set the path")
     process.p = cms.Path(process.goodOfflinePrimaryVertices *
                          process.updatedJetsSeqMiniAOD *
                          process.selectedPatJets *
@@ -282,7 +291,8 @@ def miniaod_ntuple_process(settings):
                          process.mfvEvent)
 
     output_commands = make_output_commands(process, settings)
-
+    
+    print("about to set the mods")
     mods = [
         (prepare_vis,    settings.prepare_vis),
         (run_n_tk_seeds, settings.run_n_tk_seeds),
@@ -290,10 +300,13 @@ def miniaod_ntuple_process(settings):
         (minitree_only,  settings.minitree_only),
         ]
     for modifier, mode in mods:
+        print(mods)
         modifier(process, mode, settings, output_commands)
 
+    print("modifier done")
     set_output_commands(process, output_commands)
 
+    print("returning")
     return process
 
 def ntuple_process(settings):
@@ -301,6 +314,28 @@ def ntuple_process(settings):
         return miniaod_ntuple_process(settings)
     else:
         return aod_ntuple_process(settings)
+
+# Used for samples stored in inclusive miniaods; currently set up for ZH, Wplus & Wminus
+# may need to change to handle different naming conventions 
+def signal_uses_random_pars_modifier(sample): 
+    to_replace = []
+
+    if sample.is_signal:
+        if sample.is_rp :
+            magic_randpar = 'randpars_filter = False'
+            decay = sample.name.split('_')[1]
+
+            # need some nuance with formatting ctau from float -> string to correctly match to the comparison string
+            # if ctau < 1 : e.g. want 0p1, 0p05 mm
+            # if ctau > 1 : e.g. want 10, 30 mm
+            ctau = float(sample.tau)/1000
+            if ctau < 1 :
+                ctau = str(ctau).replace('.', 'p')
+            else :
+                ctau = str(ctau).replace('.', 'p')
+                ctau = ctau.replace('p0', '')
+            to_replace.append((magic_randpar, "randpars_filter = 'randpar %s M%i_ct%s-'" % (decay, sample.mass, ctau), 'tuple template does not contain the magic string "%s"' % magic_randpar))
+    return [], to_replace
 
 def signals_no_event_filter_modifier(sample):
     if sample.is_signal:

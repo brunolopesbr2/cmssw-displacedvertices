@@ -5,6 +5,8 @@
 #include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenLumiInfoHeader.h"
+#include "FWCore/Framework/interface/LuminosityBlock.h"
 
 class MFVEventFilter : public edm::EDFilter {
 public:
@@ -19,7 +21,8 @@ private:
     bool operator==(mode_t m) const { return mode == m; }
   };
   const Mode mode;
-
+  
+  const edm::EDGetTokenT<GenLumiInfoHeader> gen_lumi_header_token; // for randpar parsing
   const edm::EDGetTokenT<pat::JetCollection> jets_token;
   const StringCutObjectSelector<pat::Jet> jet_selector;
   const int min_njets;
@@ -32,30 +35,69 @@ private:
   const StringCutObjectSelector<pat::Electron> electron_selector;
   const double min_electron_pt;
   const int min_nleptons;
+  const bool parse_randpars;
+  //const int randpar_mass;
+  const int randpar_mstop;
+  const int randpar_mso;
+  const std::string(randpar_ctau);
+  //const std::string(randpar_dcay);
   const bool debug;
 };
 
 MFVEventFilter::MFVEventFilter(const edm::ParameterSet& cfg)
   : mode(cfg.getParameter<std::string>("mode")),
+    gen_lumi_header_token(consumes<GenLumiInfoHeader, edm::InLumi>(edm::InputTag("generator"))),
     jets_token(consumes<pat::JetCollection>(cfg.getParameter<edm::InputTag>("jets_src"))),
     jet_selector(cfg.getParameter<std::string>("jet_cut")),
     min_njets(cfg.getParameter<int>("min_njets")),
     min_pt_for_ht(cfg.getParameter<double>("min_pt_for_ht")),
     min_ht(cfg.getParameter<double>("min_ht")),
     muons_token(consumes<pat::MuonCollection>(cfg.getParameter<edm::InputTag>("muons_src"))),
-    muon_selector(cfg.getParameter<std::string>("muon_cut")),
-    min_muon_pt(cfg.getParameter<double>("min_muon_pt")),
-    electrons_token(consumes<pat::ElectronCollection>(cfg.getParameter<edm::InputTag>("electrons_src"))),
-    electron_selector(cfg.getParameter<std::string>("electron_cut")),
-    min_electron_pt(cfg.getParameter<double>("min_electron_pt")),
-    min_nleptons(cfg.getParameter<int>("min_nleptons")),
-    debug(cfg.getUntrackedParameter<bool>("debug", false))
+  muon_selector(cfg.getParameter<std::string>("muon_cut")),
+  min_muon_pt(cfg.getParameter<double>("min_muon_pt")),
+  electrons_token(consumes<pat::ElectronCollection>(cfg.getParameter<edm::InputTag>("electrons_src"))),
+  electron_selector(cfg.getParameter<std::string>("electron_cut")),
+  min_electron_pt(cfg.getParameter<double>("min_electron_pt")),
+  min_nleptons(cfg.getParameter<int>("min_nleptons")),
+  parse_randpars(cfg.getParameter<bool>("parse_randpars")),
+//randpar_mass(cfg.getParameter<int>("randpar_mass")),
+  randpar_mstop(cfg.getParameter<int>("randpar_mstop")),
+  randpar_mso(cfg.getParameter<int>("randpar_mso")),
+  randpar_ctau(cfg.getParameter<std::string>("randpar_ctau")),
+//randpar_dcay(cfg.getParameter<std::string>("randpar_dcay")),
+  debug(cfg.getUntrackedParameter<bool>("debug", false))
 {
 }
 
 bool MFVEventFilter::filter(edm::Event& event, const edm::EventSetup&) {
   edm::Handle<pat::JetCollection> jets;
   event.getByToken(jets_token, jets);
+
+  const edm::LuminosityBlock& lumi = event.getLuminosityBlock();
+
+  // If pertinent, parse randpar configuration
+  // the randpar filter WILL supersede the base eventFilter. Thus, only one filter is allowed to be applied 
+  if (parse_randpars) {
+    
+    edm::Handle<GenLumiInfoHeader> gen_header;
+    lumi.getByToken(gen_lumi_header_token, gen_header);
+    
+    std::string rp_config_desc = gen_header->configDescription();
+    std::string str_mstop = std::to_string(randpar_mstop);
+    std::string str_mso = std::to_string(randpar_mso);
+    std::string str_ctau = randpar_ctau;
+    //std::string str_dcay = randpar_dcay;
+
+    std::string comp_string_SHH = " StealthSHH_2t4b_mStop-300to1400_mSo-lowandhigh_ctau-0p01to1000_" + str_mstop + "_" + str_mso + "_" + str_ctau;
+    
+    if (not (comp_string_SHH == rp_config_desc)) {
+      std::cout<<comp_string_SHH<<'\n';
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
 
   int njets = 0;
   double ht = 0;

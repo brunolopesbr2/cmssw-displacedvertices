@@ -1519,6 +1519,7 @@ _add_ds("miniaod", {
 'mfv_ZprimetoLLPto4j_tau1mm_M4500_450_2016': _fromnum1("/store/user/joeyr/dark_sector_review/zPrime_mZ_4500_mX_450_ctau_1_4j_2016_privateMC_MINI_v4_generationForDSReview", 10, fnbase="output", numbereddirs=False),
 'mfv_ZprimetoLLPto4j_tau1mm_M4500_450_2017': _fromnum1("/store/user/joeyr/dark_sector_review/zPrime_mZ_4500_mX_450_ctau_1_4j_2017_privateMC_MINI_v4_generationForDSReview", 10, fnbase="output", numbereddirs=False),
 'mfv_ZprimetoLLPto4j_tau1mm_M4500_450_2018': (6, ['/store/user/joeyr/dark_sector_review/zPrime_mZ_4500_mX_450_ctau_1_4j_2018_privateMC_MINI_v4_generationForDSReview' + '/output_%i.root' % (i) for i in chain(xrange(4,6), xrange(8,11), [2])]),
+    'StealthSHH_mStop_300_mS_100_ctau_0p01_2017': (1, ['/store/mc/RunIIFall17MiniAODv2/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/50000/0066CE96-715A-EE11-A3EB-3CECEF0D3DE4.root']),
 })
 
 
