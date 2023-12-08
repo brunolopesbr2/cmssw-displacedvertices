@@ -20,19 +20,15 @@ print("I'm about to set randpars")
 # see readme for randpars
 settings.randpars_filter = False
 # if want to test local : 
-settings.randpars_filter = 'randpar StealthSHH M300_ct0p01-'
+settings.randpars_filter = 'randpar StealthSHH 300 100 0p01'
 
-print("randpars set")
 process = ntuple_process(settings)
-print("process defined")
 dataset = 'miniaod' if settings.is_miniaod else 'main'
 sample_files(process, 'StealthSHH_mStop_300_mS_100_ctau_0p01_2017', dataset, 1)
 #sample_files(process, 'mfv_HtoLLPto4j_tau1mm_M1000_450_2017', dataset, 1)
 max_events(process, 1000)
-print("I'm about to call cmssw from argv")
 cmssw_from_argv(process)
 
-print("I got through cmssw_from_argv")
 
 if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
     from JMTucker.Tools.MetaSubmitter import *
