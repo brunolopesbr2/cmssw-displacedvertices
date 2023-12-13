@@ -24,30 +24,30 @@ def run_n_tk_seeds(process, mode, settings, output_commands):
                 output_commands += ['keep MFVVertexAuxs_mfvVerticesAux%s_*_*' % ex]
 
 def prepare_vis(process, mode, settings, output_commands):
-        if mode:
-            process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
-            process.p *= process.mfvSelectedVerticesSeq
+    if mode:
+        process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
+        process.p *= process.mfvSelectedVerticesSeq
 
-            for x in process.mfvSelectedVerticesTight, process.mfvSelectedVerticesTightNtk3, process.mfvSelectedVerticesTightNtk4:
-                x.produce_vertices = True
-                x.produce_tracks = True
-                x.vertex_src = 'mfvVertices'
+        for x in process.mfvSelectedVerticesTight, process.mfvSelectedVerticesTightNtk3, process.mfvSelectedVerticesTightNtk4:
+            x.produce_vertices = True
+            x.produce_tracks = True
+            x.vertex_src = 'mfvVertices'
 
-            process.load('JMTucker.MFVNeutralino.VertexRefitter_cfi')
-            process.mfvVertexRefitsDrop0 = process.mfvVertexRefits.clone(n_tracks_to_drop = 0)
-            process.mfvVertexRefitsDrop2 = process.mfvVertexRefits.clone(n_tracks_to_drop = 2)
-            process.p *= process.mfvVertexRefits * process.mfvVertexRefitsDrop2 *  process.mfvVertexRefitsDrop0
+        process.load('JMTucker.MFVNeutralino.VertexRefitter_cfi')
+        process.mfvVertexRefitsDrop0 = process.mfvVertexRefits.clone(n_tracks_to_drop = 0)
+        process.mfvVertexRefitsDrop2 = process.mfvVertexRefits.clone(n_tracks_to_drop = 2)
+        process.p *= process.mfvVertexRefits * process.mfvVertexRefitsDrop2 *  process.mfvVertexRefitsDrop0
 
-            output_commands += [
-                'keep *_mfvVertices_*_*',
-                'keep *_mfvSelectedVerticesTight*_*_*',
-                'keep *_mfvVertexRefits_*_*',
-                'keep *_mfvVertexRefitsDrop2_*_*',
-                'keep *_mfvVertexRefitsDrop0_*_*',
-            ]
+        output_commands += [
+            'keep *_mfvVertices_*_*',
+            'keep *_mfvSelectedVerticesTight*_*_*',
+            'keep *_mfvVertexRefits_*_*',
+            'keep *_mfvVertexRefitsDrop2_*_*',
+            'keep *_mfvVertexRefitsDrop0_*_*',
+        ]
 
-            if settings.is_mc:
-                output_commands += ['keep *_mfvGenParticles_*_*']
+    if settings.is_mc:
+        output_commands += ['keep *_mfvGenParticles_*_*']
 
 def minitree_only(process, mode, settings, output_commands):
     if mode:
