@@ -24,33 +24,30 @@ def run_n_tk_seeds(process, mode, settings, output_commands):
                 output_commands += ['keep MFVVertexAuxs_mfvVerticesAux%s_*_*' % ex]
 
 def prepare_vis(process, mode, settings, output_commands):
-    print("I'm on prepare_vis")
-    if mode:
-        print("entered the if mode")
-        process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
-        process.p *= process.mfvSelectedVerticesSeq
+        if mode:
+            process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
+            process.p *= process.mfvSelectedVerticesSeq
 
-        for x in process.mfvSelectedVerticesTight, process.mfvSelectedVerticesTightNtk3, process.mfvSelectedVerticesTightNtk4:
-            x.produce_vertices = True
-            x.produce_tracks = True
-            x.vertex_src = 'mfvVertices'
+            for x in process.mfvSelectedVerticesTight, process.mfvSelectedVerticesTightNtk3, process.mfvSelectedVerticesTightNtk4:
+                x.produce_vertices = True
+                x.produce_tracks = True
+                x.vertex_src = 'mfvVertices'
 
-        print("about to load the process")
-        process.load('JMTucker.MFVNeutralino.VertexRefitter_cfi')
-        process.mfvVertexRefitsDrop0 = process.mfvVertexRefits.clone(n_tracks_to_drop = 0)
-        process.mfvVertexRefitsDrop2 = process.mfvVertexRefits.clone(n_tracks_to_drop = 2)
-        process.p *= process.mfvVertexRefits * process.mfvVertexRefitsDrop2 *  process.mfvVertexRefitsDrop0
+            process.load('JMTucker.MFVNeutralino.VertexRefitter_cfi')
+            process.mfvVertexRefitsDrop0 = process.mfvVertexRefits.clone(n_tracks_to_drop = 0)
+            process.mfvVertexRefitsDrop2 = process.mfvVertexRefits.clone(n_tracks_to_drop = 2)
+            process.p *= process.mfvVertexRefits * process.mfvVertexRefitsDrop2 *  process.mfvVertexRefitsDrop0
 
-        output_commands += [
-            'keep *_mfvVertices_*_*',
-            'keep *_mfvSelectedVerticesTight*_*_*',
-            'keep *_mfvVertexRefits_*_*',
-            'keep *_mfvVertexRefitsDrop2_*_*',
-            'keep *_mfvVertexRefitsDrop0_*_*',
+            output_commands += [
+                'keep *_mfvVertices_*_*',
+                'keep *_mfvSelectedVerticesTight*_*_*',
+                'keep *_mfvVertexRefits_*_*',
+                'keep *_mfvVertexRefitsDrop2_*_*',
+                'keep *_mfvVertexRefitsDrop0_*_*',
             ]
 
-        if settings.is_mc:
-            output_commands += ['keep *_mfvGenParticles_*_*']
+            if settings.is_mc:
+                output_commands += ['keep *_mfvGenParticles_*_*']
 
 def minitree_only(process, mode, settings, output_commands):
     if mode:
@@ -208,7 +205,7 @@ def aod_ntuple_process(settings):
     mods = [
         (prepare_vis,    settings.prepare_vis),
         (run_n_tk_seeds, settings.run_n_tk_seeds),
-        (event_filter,   settings.event_filter, settings.randpars_filter),
+        (event_filter,   settings.event_filter),
         (minitree_only,  settings.minitree_only),
         ]
     for modifier, mode in mods:
@@ -228,7 +225,6 @@ def miniaod_ntuple_process(settings):
     settings.normalize()
     assert settings.is_miniaod
 
-    print("assert passed!")
     process = basic_process('Ntuple')
     registration_warnings(process)
     report_every(process, 1000000)
@@ -237,7 +233,6 @@ def miniaod_ntuple_process(settings):
     tfileservice(process, 'vertex_histos.root')
     output_file(process, 'ntuple.root', [])
     
-    print("about to load stuff")
     process.load('PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi')
     process.load('PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi')
     process.load('PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi')
@@ -254,7 +249,6 @@ def miniaod_ntuple_process(settings):
     process.load('JMTucker.MFVNeutralino.TriggerFloats_cff')
     process.load('JMTucker.MFVNeutralino.EventProducer_cfi')
 
-    print("loaded!")
     process.goodOfflinePrimaryVertices.input_is_miniaod = True
     process.selectedPatJets.src = 'updatedJetsMiniAOD'
     process.selectedPatMuons.src = 'slimmedMuons'
@@ -263,7 +257,7 @@ def miniaod_ntuple_process(settings):
     #process.selectedPatMuons.cut = '' # process.jtupleParams.muonCut
     #process.selectedPatElectrons.cut = '' # process.jtupleParams.electronCut
     
-    print("cuts set")
+    #print("cuts set")
     process.mfvGenParticles.gen_particles_src = 'prunedGenParticles'
     process.mfvGenParticles.last_flag_check = False
 
@@ -278,7 +272,6 @@ def miniaod_ntuple_process(settings):
     process.mfvEvent.pileup_info_src = 'slimmedAddPileupInfo'
     process.mfvEvent.met_src = 'slimmedMETs'
 
-    print("about to set the path")
     process.p = cms.Path(process.goodOfflinePrimaryVertices *
                          process.updatedJetsSeqMiniAOD *
                          process.selectedPatJets *
@@ -292,21 +285,20 @@ def miniaod_ntuple_process(settings):
 
     output_commands = make_output_commands(process, settings)
     
-    print("about to set the mods")
     mods = [
         (prepare_vis,    settings.prepare_vis),
         (run_n_tk_seeds, settings.run_n_tk_seeds),
-        (event_filter,   settings.event_filter),
+        (event_filter,   [settings.event_filter, settings.randpars_filter]),
         (minitree_only,  settings.minitree_only),
         ]
     for modifier, mode in mods:
-        print(mods)
+        #print(mods)
         modifier(process, mode, settings, output_commands)
 
-    print("modifier done")
+    #print("modifier done")
     set_output_commands(process, output_commands)
 
-    print("returning")
+    #print("returning")
     return process
 
 def ntuple_process(settings):

@@ -91,10 +91,11 @@ bool MFVEventFilter::filter(edm::Event& event, const edm::EventSetup&) {
     std::string comp_string_SHH = " StealthSHH_2t4b_mStop-300to1400_mSo-lowandhigh_ctau-0p01to1000_" + str_mstop + "_" + str_mso + "_" + str_ctau;
     
     if (not (comp_string_SHH == rp_config_desc)) {
-      std::cout<<comp_string_SHH<<'\n';
+      std::cout<<rp_config_desc<<'\n';
       return false;
     }
     else {
+      std::cout<<'I passed!';
       return true;
     }
   }

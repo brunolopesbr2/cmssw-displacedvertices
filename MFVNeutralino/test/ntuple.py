@@ -20,7 +20,7 @@ print("I'm about to set randpars")
 # see readme for randpars
 settings.randpars_filter = False
 # if want to test local : 
-settings.randpars_filter = 'randpar StealthSHH 300 100 0p01'
+settings.randpars_filter = 'randpar StealthSHH_300_100_0p01' #for Stealth SUSY: mstop_mso_ctau
 
 process = ntuple_process(settings)
 dataset = 'miniaod' if settings.is_miniaod else 'main'

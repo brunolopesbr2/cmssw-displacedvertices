@@ -62,26 +62,19 @@ def setup_event_filter(process,
         event_filter_require_vertex = False
     elif mode:
         if mode is not True:
-            print("mode is not true")
-            #raise ValueError('bad mode %r' % mode)
+            raise ValueError('bad mode %r' % mode)
         event_filter = True
 
-    print(rp_mode)
     if rp_mode :
-        print("entered rp_mode")
         event_filter = True
         event_filter_require_vertex = False
         event_filter_jes_mult = 0
         rp_filter = True
-        print(rp_mode.find('_'))
-        #rp_mass = (int)(rp_mode[rp_mode.find('M')+1 : rp_mode.find('_')])
-        rp_mstop = (int)(rp_mode[rp_mode.find('0p01to1000'+1) : rp_mode.find('_')])
-        print(rp_mstop)
-        rp_mso = (int)(rp_mode[rp_mode.find(rp_mstop) : rp_mode.find('_')])
-        rp_ctau = rp_mode[rp_mode.find(rp_mso)+1 : ]
-        #rp_dcay = rp_mode[rp_mode.find('H') : rp_mode.find(' M')]
 
-        #print(rp_dcay, rp_mass, rp_ctau)
+        rp_mode_list = rp_mode.split('_')
+        rp_mstop = int(rp_mode_list[1])
+        rp_mso = int(rp_mode_list[2])
+        rp_ctau = str(rp_mode_list[3])
 
     if trigger_filter == 'jets only':
         from JMTucker.MFVNeutralino.TriggerFilter_cfi import mfvTriggerFilterJetsOnly as triggerFilter
@@ -137,7 +130,7 @@ def setup_event_filter(process,
             print "In EventFilter.py conditional"
             #eventFilter.randpar_mass = rp_mass
             eventFilter.randpar_mstop = rp_mstop
-            eventFilter.randpar_mso = rp.mso
+            eventFilter.randpar_mso = rp_mso
             eventFilter.randpar_ctau = rp_ctau
             #eventFilter.randpar_dcay = rp_dcay
             eventFilter.parse_randpars = True
