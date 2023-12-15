@@ -16,17 +16,16 @@ if use_btag_triggers :
 else :
     settings.event_filter = 'jets only'
 
-print("I'm about to set randpars")
 # see readme for randpars
 settings.randpars_filter = False
 # if want to test local : 
-settings.randpars_filter = 'randpar StealthSHH_300_100_0p01' #for Stealth SUSY: mstop_mso_ctau
+#settings.randpars_filter = 'randpar StealthSHH_300_100_0p01' #for Stealth SUSY: mstop_mso_ctau
 
 process = ntuple_process(settings)
 dataset = 'miniaod' if settings.is_miniaod else 'main'
 sample_files(process, 'StealthSHH_mStop_300_mS_100_ctau_0p01_2017', dataset, 1)
 #sample_files(process, 'mfv_HtoLLPto4j_tau1mm_M1000_450_2017', dataset, 1)
-max_events(process, 1000)
+#max_events(process, 1000)
 cmssw_from_argv(process)
 
 
