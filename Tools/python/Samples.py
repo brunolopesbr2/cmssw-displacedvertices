@@ -77,7 +77,7 @@ def _rp(sample):
     s = sample if type(sample) == str else sample.name
 
     rp = False
-    rp_list = ['ZH', 'WmH', 'WpH', 'SHH', 'SYY']
+    rp_list = ['ZH', 'WmH', 'WpH', 'Stealth']
     for i in rp_list :
         if s.startswith(i) :     
             rp = True

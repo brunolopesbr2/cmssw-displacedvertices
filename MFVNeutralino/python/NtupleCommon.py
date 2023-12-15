@@ -312,21 +312,26 @@ def ntuple_process(settings):
 def signal_uses_random_pars_modifier(sample): 
     to_replace = []
 
+#Changed to match the StealthSUSY randpar line pattern
     if sample.is_signal:
         if sample.is_rp :
             magic_randpar = 'randpars_filter = False'
-            decay = sample.name.split('_')[1]
+            decay = str(sample.name.split('_')[0])
+            mstop = int(sample.name.split('_')[2])
+            mso = int(sample.name.split('_')[4])
+            ctau = str(sample.name.split('_')[6])
 
             # need some nuance with formatting ctau from float -> string to correctly match to the comparison string
             # if ctau < 1 : e.g. want 0p1, 0p05 mm
             # if ctau > 1 : e.g. want 10, 30 mm
-            ctau = float(sample.tau)/1000
-            if ctau < 1 :
-                ctau = str(ctau).replace('.', 'p')
-            else :
-                ctau = str(ctau).replace('.', 'p')
-                ctau = ctau.replace('p0', '')
-            to_replace.append((magic_randpar, "randpars_filter = 'randpar %s M%i_ct%s-'" % (decay, sample.mass, ctau), 'tuple template does not contain the magic string "%s"' % magic_randpar))
+            # For the Stealth SUSY samples, ctau is already in the string format
+            #ctau = float(sample.tau)/1000
+            #if ctau < 1 :
+            #    ctau = str(ctau).replace('.', 'p')
+            #else :
+            #    ctau = str(ctau).replace('.', 'p')
+            #    ctau = ctau.replace('p0', '')
+            to_replace.append((magic_randpar, "randpars_filter = 'randpar %s_%i_%i_%s'" % (decay, mstop, mso, ctau), 'tuple template does not contain the magic string "%s"' % magic_randpar))
     return [], to_replace
 
 def signals_no_event_filter_modifier(sample):
