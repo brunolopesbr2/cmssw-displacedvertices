@@ -7,17 +7,23 @@ from JMTucker.Tools.CMSSWTools import json_path
 
 def _model(sample):
     s = sample if type(sample) == str else sample.name
-    return s.split('_tau')[0]
+    if s.startswith('Stealth'):
+        return s.split('_')[0]
+    else:
+        return s.split('_tau')[0]
 
 def _tau(sample):
     s = sample if type(sample) == str else sample.name
     is_um = '0um_' in s
 
     # parse string to extract the lifetime
-    x = s[s.index('tau')+3:s.index('um_' if is_um else 'mm_')]
-
+    if s.startswith('Stealth'):
+        x = s[s.index('tau')+4:s.index('201')-1]
+    else:
+        x = s[s.index('tau')+3:s.index('um_' if is_um else 'mm_')]
     # special case where the string isn't directly castable to a number!
     if x == '0p1' : x = 0.1
+    if x == '0p01': x = 0.01
 
     x = float(x)
     if not is_um:
@@ -26,11 +32,19 @@ def _tau(sample):
 
 def _mass(sample):
     s = sample if type(sample) == str else sample.name
-    x = s.index('_M')
-    y = s.find('_',x+1)
-    if y == -1:
-        y = len(s)
-    return int(s[x+2:y])
+
+    if s.startswith('Stealth'):
+        x = s.find('mStop')
+        y = s.find('_',x+7)
+        if y == -1:
+            y = len(s)
+        return int(s[x+6:y])
+    else:
+        x = s.index('_M')
+        y = s.find('_',x+1)
+        if y == -1:
+            y = len(s)
+        return int(s[x+2:y])
 
 def _decay(sample):
     s = sample if type(sample) == str else sample.name
@@ -58,6 +72,8 @@ def _decay(sample):
         'mfv_HtoLLPto4b': r'H \rightarrow LLP \rightarrow bbbb',
         'mfv_ZprimetoLLPto4j': r'Zprime \rightarrow LLP \rightarrow jjjj',
         'mfv_ZprimetoLLPto4b': r'Zprime \rightarrow LLP \rightarrow bbbb',
+        'StealthSHH': r'stop \rightarrow St \rightarrow bbt',
+        'StealthSYY': r'stop \rightarrow St \rightarrow ggt',
         }[_model(s)]
     year = int(s.rsplit('_')[-1])
     assert 2015 <= year <= 2018
@@ -405,7 +421,9 @@ StealthSYY_samples_2017 = [
     ]
 
 
-all_signal_samples_2017 = mfv_signal_samples_2017 + mfv_stopdbardbar_samples_2017 + StealthSHH_samples_2017 + StealthSYY_samples_2017
+#all_signal_samples_2017 = mfv_signal_samples_2017 + mfv_stopdbardbar_samples_2017 + StealthSHH_samples_2017 + StealthSYY_samples_2017
+
+all_signal_samples_2017 = StealthSHH_samples_2017 + StealthSYY_samples_2017
 
 for s in all_signal_samples_2017:
     _set_signal_stuff(s)
@@ -674,7 +692,9 @@ StealthSYY_samples_2018 = [
     MCSample('StealthSYY_mStop_1500_mS_1275_ctau_1000_2018', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV_madgraphMLM-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2/MINIAODSIM', 8994264)
     ]
 
-all_signal_samples_2018 = mfv_signal_samples_2018 + mfv_stopdbardbar_samples_2018 + StealthSHH_samples_2018 + StealthSYY_samples_2018
+#all_signal_samples_2018 = mfv_signal_samples_2018 + mfv_stopdbardbar_samples_2018 + StealthSHH_samples_2018 + StealthSYY_samples_2018
+
+all_signal_samples_2018 = StealthSHH_samples_2018 + StealthSYY_samples_2018
 
 for s in all_signal_samples_2018:
     _set_signal_stuff(s)
@@ -1727,6 +1747,10 @@ for x in _alls:
 ########
 # miniaod
 ########
+
+## Setting up StealthSUSY
+for sample in StealthSHH_samples_2017 + StealthSYY_samples_2017 + StealthSHH_samples_2018 + StealthSYY_samples_2018:
+    sample.add_dataset('miniaod', sample.dataset, sample.nevents_orig)
 
 for sample in data_samples_2017 + auxiliary_data_samples_2017:
     sample.add_dataset('miniaod', sample.dataset.replace('17Nov2017-v1/AOD', '31Mar2018-v1/MINIAOD'))
@@ -2976,7 +3000,7 @@ if __name__ == '__main__':
                 print colors.boldred('no miniaod for %s' % s.name)
 
     if 0:
-        for s in qcd_samples_2017 + ttbar_samples_2017 + qcd_samples_2018 + ttbar_samples_2018:
+        for s in qcd_samples_2017 + ttbar_samples_2017 + qcd_samples_2018 + ttbar_samples_2018 + StealthSHH_samples_2017 + StealthSYY_samples_2017 + StealthSHH_samples_2018 + StealthSYY_samples_2018:
             s.set_curr_dataset('miniaod')
             il = s.int_lumi_orig / 1000
             nfn = len(s.filenames)
