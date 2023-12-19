@@ -88,14 +88,15 @@ bool MFVEventFilter::filter(edm::Event& event, const edm::EventSetup&) {
     std::string str_ctau = randpar_ctau;
     //std::string str_dcay = randpar_dcay;
 
-    std::string comp_string_SHH = " StealthSHH_2t4b_mStop-300to1400_mSo-lowandhigh_ctau-0p01to1000_" + str_mstop + "_" + str_mso + "_" + str_ctau;
-    
-    if (not (comp_string_SHH == rp_config_desc)) {
-      std::cout<<rp_config_desc<<'\n';
+    std::string comp_string_SHH = "StealthSHH_2t4b_mStop-300to1400_mSo-lowandhigh_ctau-0p01to1000_" + str_mstop + "_" + str_mso + "_" + str_ctau;
+    std::string comp_string_SYY = "StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_" + str_mstop + "_" + str_mso + "_" + str_ctau;
+    if (not (comp_string_SHH == rp_config_desc || comp_string_SYY == rp_config_desc)) {
+      //std::cout<<rp_config_desc<<'\n';
+      //std::cout<<comp_string_SYY<<'\n';
       return false;
     }
     else {
-      std::cout<<'I passed!';
+      //std::cout<<'p';
       return true;
     }
   }

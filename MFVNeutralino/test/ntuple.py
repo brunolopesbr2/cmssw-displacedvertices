@@ -19,11 +19,11 @@ else :
 # see readme for randpars
 settings.randpars_filter = False
 # if want to test local : 
-#settings.randpars_filter = 'randpar StealthSHH_300_100_0p01' #for Stealth SUSY: mstop_mso_ctau
+#settings.randpars_filter = 'randpar StealthSYY_1100_100_0p1' #for Stealth SUSY: mstop_mso_ctau
 
 process = ntuple_process(settings)
 dataset = 'miniaod' if settings.is_miniaod else 'main'
-sample_files(process, 'StealthSHH_mStop_300_mS_100_ctau_0p01_2017', dataset, 1)
+sample_files(process, 'StealthSYY_mStop_900_mS_100_ctau_10_2017', dataset, 1)
 #sample_files(process, 'mfv_HtoLLPto4j_tau1mm_M1000_450_2017', dataset, 1)
 #max_events(process, 1000)
 cmssw_from_argv(process)
@@ -35,7 +35,7 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
     if use_btag_triggers :
         samples = pick_samples(dataset, qcd=True, ttbar=False, all_signal=not settings.run_n_tk_seeds, data=False, bjet=True) # no data currently; no sliced ttbar since inclusive is used
     else :
-        samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=False, mfv_HtoLLPto4b=False, mfv_ZprimetoLLPto4j=False, mfv_ZprimetoLLPto4b=False, StealthSHH=True, StealthSYY=True)
+        samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=False, mfv_HtoLLPto4b=False, mfv_ZprimetoLLPto4j=False, mfv_ZprimetoLLPto4b=False, StealthSHH=False, StealthSYY=True)
 
     set_splitting(samples, dataset, 'ntuple', data_json=json_path('ana_2017p8.json'), limit_ttbar=True)
 

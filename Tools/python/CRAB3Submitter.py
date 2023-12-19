@@ -52,7 +52,7 @@ class CRABSubmitter:
                  dataset = 'main',
                  lumi_mask = None,
                  job_control_from_sample = False,
-                 storage_site = 'T3_US_FNALLPC',
+                 storage_site = 'T3_CH_CERNBOX',
                  publish_name = '',
                  aaa = False,
                  fnallpc = False,
