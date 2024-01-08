@@ -25,7 +25,7 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
         pset_modifier = chain_modifiers(is_mc_modifier, per_sample_pileup_weights_modifier())
     else :
         #samples = pick_samples(dataset)
-        samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=True, mfv_HtoLLPto4b=True, mfv_ZprimetoLLPto4j=True, mfv_ZprimetoLLPto4b=True)
+        samples = pick_samples(dataset, qcd=False, ttbar=False, all_signal=False, data=False, mfv_splitSUSY=False, mfv_HtoLLPto4j=False, mfv_HtoLLPto4b=False, mfv_ZprimetoLLPto4j=False, mfv_ZprimetoLLPto4b=False, StealthSHH=True, StealthSYY=True)
         pset_modifier = chain_modifiers(is_mc_modifier, per_sample_pileup_weights_modifier())
     set_splitting(samples, dataset, 'minitree', data_json=json_path('ana_2017p8.json'))
 
