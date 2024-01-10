@@ -106,6 +106,7 @@ should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 transfer_input_files = __TARBALL_FN__,cs_jobmap,cs_njobs,cs_pset.py,cs_filelist.py,cs.json,cs_cmsrun_args,cs_primaryds,cs_samplename,cs_timestamp__INPUT_FNS__
 x509userproxy = $ENV(X509_USER_PROXY)
++JobFlavour = "espresso"
 __EXTRAS__
 Queue __NJOBS__
 '''
@@ -160,6 +161,13 @@ def get(i): return _l[i]
 
         if submit_host.endswith('fnal.gov'):
             schedds = ['lpcschedd%i.fnal.gov' % i for i in 3,4,5,6]
+            for schedd in schedds:
+                schedd_d = os.path.join(links_dir, schedd)
+                if not os.path.isdir(schedd_d):
+                    os.mkdir(schedd_d)
+
+        elif submit_host.endswith('cern.ch'):
+            schedds = ['bigbird08.cern.ch']
             for schedd in schedds:
                 schedd_d = os.path.join(links_dir, schedd)
                 if not os.path.isdir(schedd_d):
@@ -350,7 +358,7 @@ def get(i): return _l[i]
 
     def normalize_fns(self, fns):
         # JMTBAD fall back to global redirector
-        return ['root://cmseos.fnal.gov/' + x for x in fns if x.startswith('/store')]
+        return ['root://eosuser.cern.ch/' + x for x in fns if x.startswith('/eos')]
 
     def filelist(self, sample, working_dir):
         # JMTBAD are there performance problems by not matching the json to the files per job?

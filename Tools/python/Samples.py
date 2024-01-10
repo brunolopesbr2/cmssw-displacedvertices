@@ -1711,6 +1711,10 @@ __all__ = [
     'mfv_ZprimetoLLPto4b_samples_2016',
     'mfv_ZprimetoLLPto4b_samples_2017',
     'mfv_ZprimetoLLPto4b_samples_2018',
+    'StealthSHH_samples_2017',
+    'StealthSYY_samples_2017',
+    'StealthSHH_samples_2018',
+    'StealthSYY_samples_2018',
 
     'registry',
     ]
@@ -3220,7 +3224,7 @@ for s in registry.all():
         for ds4 in 'ntuple', 'nr_':
             if ds.startswith(ds4):
                 s.datasets[ds].condor = True
-                s.datasets[ds].xrootd_url = xrootd_sites['T3_US_FNALLPC']
+                s.datasets[ds].xrootd_url = xrootd_sites['T3_CH_CERNBOX']
 
 ########
 # other condor declarations, generate condorable dict with Shed/condor_list.py
