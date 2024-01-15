@@ -8,7 +8,7 @@ from JMTucker.Tools import DBS
 ########################################################################
 
 xrootd_sites = {
-    'T3_CH_CERNBOX': 'root://cms-xrd-global.cern.ch/',
+    'T3_CH_CERNBOX': 'root://eosuser.cern.ch/',
     'T3_US_FNALLPC': 'root://cmseos.fnal.gov/',
     'T1_US_FNAL_Disk': 'root://cmsxrootd-site.fnal.gov/',
     'T2_US_Nebraska': 'root://cmsxrootd.fnal.gov/',
