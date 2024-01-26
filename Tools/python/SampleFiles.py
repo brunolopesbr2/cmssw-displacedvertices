@@ -143,6 +143,7 @@ for name, ds, fns in _removed:
 ################################################################################
 
 _add_ds("ntuplev27darksectorreviewm", {
+'StealthSYY_mStop_1100_mS_100_ctau_10_2017': _fromnum1("/eos/user/b/brlopesd/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/NtupleV27darksectorreview_withGenInfom_2017/231220_161219", 283),
 'StealthSHH_mStop_1300_mS_100_ctau_10_2018': _fromnum1("/eos/user/b/brlopesd/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV_madgraphMLM-pythia8/Ntuplev27darksectorreview_withGenInfom_2018/231220_171601", 429),
 'StealthSHH_mStop_500_mS_100_ctau_100_2018': _fromnum1("/eos/user/b/brlopesd/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV_madgraphMLM-pythia8/NtupleV27darksectorreview_withGenInfom_2018/231220_170154", 429),
 'StealthSHH_mStop_1100_mS_875_ctau_100_2018': _fromnum1("/eos/user/b/brlopesd/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV_madgraphMLM-pythia8/NtupleV27darksectorreview_withGenInfom_2018/231220_171430", 429),

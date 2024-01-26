@@ -449,7 +449,7 @@ def get(i): return _l[i]
         cwd = os.getcwd()
         os.chdir(working_dir)
         try:
-            submit_out, submit_ret = popen('condor_submit < cs_submit.jdl', return_exit_code=True)
+            submit_out, submit_ret = popen('condor_submit -spool < cs_submit.jdl', return_exit_code=True)
             ok = False
             cluster = None
             schedd = None

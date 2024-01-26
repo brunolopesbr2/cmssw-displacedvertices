@@ -383,7 +383,9 @@ class SamplesRegistry:
             for s in samples:
                 print s.name
             raw_input('ok?')
-
+            
+        #print("raise if none = ", raise_if_none)
+        #print("samples = ", samples)
         if raise_if_none and not samples:
             raise ValueError('no samples found in argv')
 
