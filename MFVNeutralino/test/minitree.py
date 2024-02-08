@@ -16,11 +16,11 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
             Samples.ttbar_samples_2015 + Samples.qcd_samples_2015 + Samples.qcd_samples_ext_2015 + \
             Samples.all_signal_samples_2015
     elif year == 2016:
-        samples = Samples.mfv_HtoLLPto4j_samples_2016 + Samples.mfv_HtoLLPto4b_samples_2016 + Samples.mfv_ZprimetoLLPto4j_samples_2016 + Samples.mfv_ZprimetoLLPto4b_samples_2016
+        #samples = Samples.mfv_HtoLLPto4j_samples_2016 + Samples.mfv_HtoLLPto4b_samples_2016 + Samples.mfv_ZprimetoLLPto4j_samples_2016 + Samples.mfv_ZprimetoLLPto4b_samples_2016
         #samples = Samples.data_samples + \
         #    Samples.ttbar_samples + Samples.qcd_samples + Samples.qcd_samples_ext + Samples.qcd_hip_samples + \
         #    Samples.all_signal_samples
-
+        samples = Samples.mfv_StealthSHH_samples_2016 + Samples.mfv_StealthSYY_samples_2016
     from JMTucker.Tools.MetaSubmitter import set_splitting
     set_splitting(samples, dataset, 'minitree', data_json='jsons/ana_2015p6.json')
 

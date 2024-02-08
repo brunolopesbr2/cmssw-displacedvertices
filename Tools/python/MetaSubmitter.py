@@ -151,7 +151,7 @@ def set_splitting(samples, dataset, jobtype, data_json=None, default_files_per=2
         for sample in samples:
             # prefer to split by file with CondorSubmitter  for these jobs to not overload xrootd aaa
             sample.set_curr_dataset(dataset)
-            sample.split_by = 'files' if sample.condor else 'events'
+            sample.split_by = 'files'
             assert d.has_key(sample.name)
             sample.events_per = intround(d[sample.name][0], 4)
             sample.files_per  = intround(d[sample.name][1], 4)
@@ -320,16 +320,16 @@ def set_splitting(samples, dataset, jobtype, data_json=None, default_files_per=2
             if sample.is_signal:
                 sample.split_by = 'files'
             else:
-                sample.split_by = 'files' if sample.condor else 'events'
+                sample.split_by = 'files'
             name = sample.name.replace('_2015', '')
             name = name.replace('_hip1p0_mit', '').replace('_hip1p0', '').replace('_retest', '')
             if not d.has_key(name):
                 if sample.is_signal:
-                    sample.events_per = 200
-                    sample.files_per = 1
+                    sample.events_per = 9000000
+                    sample.files_per = 999
                 else:
-                    sample.events_per = 200
-                    sample.files_per = 1
+                    sample.events_per = 9000000
+                    sample.files_per = 999
             else:
                 erate, frate = d[name]
                 if dataset == 'miniaod':

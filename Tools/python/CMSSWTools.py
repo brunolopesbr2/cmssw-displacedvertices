@@ -34,7 +34,7 @@ def input_files(process, fns):
         fns = [fns]
     files = []
     for fn in fns:
-        if not fn.startswith('/store') and not fn.startswith('root://'):
+        if not fn.startswith('/store') and not fn.startswith('root://') and not fn.startswith('/eos'):
             fn = 'file:' + fn
         files.append(fn)
     process.source.fileNames = cms.untracked.vstring(*files)

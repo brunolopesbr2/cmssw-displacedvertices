@@ -77,7 +77,7 @@ def has(name, ds):
 def get(name, ds):
     return _d.get((name, ds), None)
 
-def get_fns(name, ds):
+def get_ns(name, ds):
     return _d[(name,ds)][1]
 
 def set_process(process, name, ds, num=-1):
@@ -92,7 +92,7 @@ def who(name, ds):
     nfns, fns = _d[(name,ds)]
     users = set()
     for fn in fns:
-        assert fn.startswith('/store')
+        assert fn.startswith('/store') or fn.startswith('/eos/user')
         if fn.startswith('/store/user'):
             users.add(fn.split('/')[3])
     return tuple(sorted(users))
@@ -2576,10 +2576,10 @@ if __name__ == '__main__':
             except ReferenceError:
                 return 1e99
         for fn in get(sample, dataset)[1]:
-            n = get_n(ROOT.TFile.Open('root://cmseos.fnal.gov/' + fn), 'Events')
+            n = get_n(ROOT.TFile.Open('root://eosuser.cern.ch/' + fn), 'Events')
             nev += n
             if is_ntuple:
-                n2 = get_n(ROOT.TFile.Open('root://cmseos.fnal.gov/' + fn.replace('ntuple', 'vertex_histos')), 'mfvVertices/h_n_all_tracks')
+                n2 = get_n(ROOT.TFile.Open('root://eosuser.cern.ch/' + fn.replace('ntuple', 'vertex_histos')), 'mfvVertices/h_n_all_tracks')
                 nev2 += n2
                 print fn, n, n2
             else:
@@ -2641,7 +2641,7 @@ if __name__ == '__main__':
         for line in open(list_fn):
             line = line.strip()
             if line.endswith('.root'):
-                assert '/store' in line
+                assert '/store' in line or '/eos/user' in line
                 other_fns.add(line.replace('/eos/uscms', ''))
         all_fns = set(allfiles())
         print 'root files in %s not in SampleFiles:' % list_fn

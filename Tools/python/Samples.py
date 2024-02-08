@@ -6,17 +6,24 @@ from JMTucker.Tools.Sample import *
 
 def _model(sample):
     s = sample if type(sample) == str else sample.name
-    return s.split('_tau')[0]
+    if s.startswith('mfv_Stealth'):
+        return s.split('_m')[0] 
+    else:
+        return s.split('_tau')[0]
 
 def _tau(sample):
     s = sample if type(sample) == str else sample.name
     is_um = '0um_' in s
 
     # parse string to extract the lifetime
-    x = s[s.index('tau')+3:s.index('um_' if is_um else 'mm_')]
+    if s.startswith('mfv_Stealth'):
+        x = s[s.index('tau')+4:s.index('201')-1]
+    else:
+        x = s[s.index('tau')+3:s.index('um_' if is_um else 'mm_')]
 
     # special case where the string isn't directly castable to a number!
     if x == '0p1' : x = 0.1
+    if x == '0p01': x = 0.01
 
     x = float(x)
     if not is_um:
@@ -25,11 +32,18 @@ def _tau(sample):
 
 def _mass(sample):
     s = sample if type(sample) == str else sample.name
-    x = s.index('_M')
-    y = s.find('_',x+1)
-    if y == -1:
-        y = len(s)
-    return int(s[x+2:y])
+    if s.startswith('mfv_Stealth'):
+        x = s.find('mStop')
+        y = s.find('_',x+7)
+        if y == -1:
+            y = len(s)
+        return int(s[x+6:y])
+    else:
+        x = s.index('_M')
+        y = s.find('_',x+1)
+        if y == -1:
+            y = len(s)
+        return int(s[x+2:y])
 
 def _decay(sample):
     s = sample if type(sample) == str else sample.name
@@ -55,6 +69,8 @@ def _decay(sample):
         'mfv_HtoLLPto4b': r'H \rightarrow LLP \rightarrow bbbb',
         'mfv_ZprimetoLLPto4j': r'Zprime \rightarrow LLP \rightarrow jjjj',
         'mfv_ZprimetoLLPto4b': r'Zprime \rightarrow LLP \rightarrow bbbb',
+        'mfv_StealthSHH': r'stop \rightarrow St \rightarrow bbt',
+        'mfv_StealthSYY': r'stop \rightarrow St \rightarrow ggt',
         }[_model(sample)]
     if s.endswith('_2015'):
         decay += ' (2015)'
@@ -71,6 +87,15 @@ def _latex(sample):
         tau = '%4i\mm' % (tau/1000)
     return r'$%s$,   $c\tau = %s$, $M = %4s\GeV$' % (_decay(sample), tau, _mass(sample))
 
+def _rp(sample):
+    s = sample if type(sample) == str else sample.name
+    rp = False
+    rp_list = ['ZH', 'WmH', 'WpH', 'mfv_Stealth']
+    for i in rp_list :
+        if s.startswith(i) :     
+            rp = True
+    return rp
+
 def _set_signal_stuff(sample):
     sample.is_signal = True
     sample.model = _model(sample)
@@ -78,7 +103,7 @@ def _set_signal_stuff(sample):
     sample.tau  = _tau(sample)
     sample.mass = _mass(sample)
     sample.latex = _latex(sample)
-
+    sample.is_rp = _rp(sample)
 ########################################################################
 
 ########
@@ -519,7 +544,179 @@ MCSample('mfv_ZprimetoLLPto4b_tau1mm_M4500_2200_2016', '/mfv_ZprimetoLLPto4b_tau
 MCSample('mfv_ZprimetoLLPto4b_tau1mm_M4500_450_2016', '/mfv_ZprimetoLLPto4b_tau1mm_M4500_450_2016/None/USER', 10000),
 ]
 
+mfv_StealthSHH_samples_2016 = [ 
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_300_mS_75_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_500_mS_275_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_700_mS_475_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_900_mS_675_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1100_mS_875_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1300_mS_1075_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_100_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_0p01_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_0p1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_1_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_10_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_100_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+MCSample('mfv_StealthSHH_mStop_1500_mS_1275_ctau_1000_2016', '/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8483216),
+]
 
+mfv_StealthSYY_samples_2016 = [ 
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_300_mS_75_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_500_mS_275_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_700_mS_475_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_900_mS_675_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1100_mS_875_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1300_mS_1075_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_100_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_0p01_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_0p1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_1_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_10_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_100_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+MCSample('mfv_StealthSYY_mStop_1500_mS_1275_ctau_1000_2016', '/StealthSYY_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/AODSIM', 8161595),
+]
 
 for s in mfv_splitSUSY_samples_2016 + mfv_HtoLLPto4j_samples_2016 + mfv_HtoLLPto4b_samples_2016 + mfv_ZprimetoLLPto4j_samples_2016 + mfv_ZprimetoLLPto4b_samples_2016:
     #print "JOEY mass is %s" % _mass(s) # FIXME we're dropping the LSP mass; could do something custom here to only parse that part though...
@@ -531,6 +728,10 @@ for s in mfv_splitSUSY_samples_2016 + mfv_HtoLLPto4j_samples_2016 + mfv_HtoLLPto
         s.condor = True
         s.xrootd_url = xrootd_sites['T2_US_UCSD'] # FIXME note! had to modify for dark sector review RECO files, which were too large to copy over
 
+for s in mfv_StealthSHH_samples_2016 + mfv_StealthSYY_samples_2016:
+    s.add_dataset('AOD', s.dataset, s.nevents_orig)
+    _set_signal_stuff(s)
+    
 
 ########
 # 2016 MC = main, so no _2016 in names
@@ -1102,6 +1303,8 @@ __all__ = [
     'mfv_HtoLLPto4b_samples_2016',
     'mfv_ZprimetoLLPto4j_samples_2016',
     'mfv_ZprimetoLLPto4b_samples_2016',
+    'mfv_StealthSHH_samples_2016',
+    'mfv_StealthSYY_samples_2016',
 
     'registry',
     ]
@@ -1278,7 +1481,7 @@ for s in registry.all():
         for ds4 in ds4condor:
             if ds.startswith(ds4):
                 s.datasets[ds].condor = True
-                s.datasets[ds].xrootd_url = xrootd_sites['T3_US_FNALLPC']
+                s.datasets[ds].xrootd_url = xrootd_sites['T3_CH_CERNBOX']
 
 ########
 # other condor declarations, generate condorable dict with Shed/condor_list.py

@@ -260,7 +260,7 @@ def crab_get_output_dir(working_dir):
     else:
         assert not cfg.Data.publication
         publish_name = rq['RequestName'].split(username + '_')[1] # maybe?
-    return '/store/user/%s/%s/%s/%s' % (username, primary_dataset, publish_name, timestamp)
+    return '/eos/user/%s/%s/%s/%s/%s' % (username[0], username, primary_dataset, publish_name, timestamp)
 
 if __name__ == '__main__':
     rq = crab_requestcache(sys.argv[1])

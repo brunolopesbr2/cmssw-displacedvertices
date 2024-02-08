@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 from JMTucker.Tools.MiniAOD_cfg import *
 from JMTucker.Tools.CMSSWTools import *
@@ -13,8 +13,9 @@ prepare_vis = not run_n_tk_seeds and False
 keep_all = prepare_vis
 keep_gen = False
 event_filter = not keep_all
-version = 'V27darksectorreview_withGenInfom'
+version = 'V27darksectorreviewm'
 batch_name = 'Ntuple' + version
+randpars_filter = False
 if minitree_only:
     batch_name = 'MiniNtuple'  + version
 elif keep_gen:
@@ -23,6 +24,19 @@ elif not event_filter:
     batch_name += '_NoEF'
 #batch_name += '_ChangeMeIfSettingsNotDefault'
 
+#This was in NtupleCommon
+def signal_uses_random_pars_modifier(sample): 
+    to_replace = []
+#Changed to match the StealthSUSY randpar line pattern
+    if sample.is_signal:
+        if sample.is_rp :
+            magic_randpar = 'randpars_filter = False'
+            decay = str(sample.name.split('_')[0])
+            mstop = int(sample.name.split('_')[2])
+            mso = int(sample.name.split('_')[4])
+            ctau = str(sample.name.split('_')[6])
+            to_replace.append((magic_randpar, "randpars_filter = 'randpar %s_%i_%i_%s'" % (decay, mstop, mso, ctau), 'tuple template does not contain the magic string "%s"' % magic_randpar))
+    return [], to_replace
 ####
 
 process = pat_tuple_process(None, is_mc, year, H, repro)
@@ -164,8 +178,8 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
             Samples.all_signal_samples_2015
     elif year == 2016:
         #samples = Samples.mfv_splitSUSY_samples_2016
-        samples = Samples.mfv_HtoLLPto4j_samples_2016 + Samples.mfv_HtoLLPto4b_samples_2016 + Samples.mfv_ZprimetoLLPto4j_samples_2016 + Samples.mfv_ZprimetoLLPto4b_samples_2016
-
+        #samples = Samples.mfv_HtoLLPto4j_samples_2016 + Samples.mfv_HtoLLPto4b_samples_2016 + Samples.mfv_ZprimetoLLPto4j_samples_2016 + Samples.mfv_ZprimetoLLPto4b_samples_2016
+        samples = Samples.mfv_StealthSHH_samples_2016 + Samples.mfv_StealthSYY_samples_2016
         #samples = \
         #    Samples.data_samples + \
         #    Samples.ttbar_samples + Samples.qcd_samples + Samples.qcd_samples_ext + Samples.qcd_hip_samples + \

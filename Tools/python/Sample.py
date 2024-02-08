@@ -9,6 +9,7 @@ from JMTucker.Tools.general import big_warn, typed_from_argv
 ########################################################################
 
 xrootd_sites = {
+    'T3_CH_CERNBOX': 'root://eosuser.cern.ch/',
     'T3_US_FNALLPC': 'root://cmseos.fnal.gov/',
     'T1_US_FNAL_Disk': 'root://cmsxrootd-site.fnal.gov/',
     'T2_US_UCSD': 'root://redirector.t2.ucsd.edu:1095/',

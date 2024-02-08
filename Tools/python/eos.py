@@ -1,7 +1,7 @@
 import sys, subprocess, os, fnmatch, re
 
 url = 'root://cmseos.fnal.gov/'
-global_url = 'root://cms-xrd-global.cern.ch/'
+global_url = 'root://eosuser.cern.ch/'
 user = os.environ['USER']
 
 def _popen(cmd, shell=False):
