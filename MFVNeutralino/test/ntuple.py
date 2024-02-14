@@ -16,6 +16,8 @@ event_filter = not keep_all
 version = 'V27darksectorreviewm'
 batch_name = 'Ntuple' + version
 randpars_filter = False
+# if want to test local : 
+randpars_filter = 'randpar StealthSHH_1100_100_0p1' #for Stealth SUSY: mstop_mso_ctau
 if minitree_only:
     batch_name = 'MiniNtuple'  + version
 elif keep_gen:
@@ -30,11 +32,15 @@ def signal_uses_random_pars_modifier(sample):
 #Changed to match the StealthSUSY randpar line pattern
     if sample.is_signal:
         if sample.is_rp :
-            magic_randpar = 'randpars_filter = False'
-            decay = str(sample.name.split('_')[0])
-            mstop = int(sample.name.split('_')[2])
-            mso = int(sample.name.split('_')[4])
-            ctau = str(sample.name.split('_')[6])
+            print "in signal_uses_random_pars_modifier and is_rp"
+            print sample.name
+            print sample.name.split('_')
+            #['mfv', 'StealthSYY', 'mStop', '1500', 'mS', '1275', 'ctau', '1000', '2016']
+            magic_randpar = "randpars_filter = False"
+            decay = str(sample.name.split('_')[1])
+            mstop = int(sample.name.split('_')[3])
+            mso = int(sample.name.split('_')[5])
+            ctau = str(sample.name.split('_')[7])
             to_replace.append((magic_randpar, "randpars_filter = 'randpar %s_%i_%i_%s'" % (decay, mstop, mso, ctau), 'tuple template does not contain the magic string "%s"' % magic_randpar))
     return [], to_replace
 ####
@@ -100,7 +106,7 @@ if run_n_tk_seeds:
 
 if event_filter:
     import JMTucker.MFVNeutralino.EventFilter
-    JMTucker.MFVNeutralino.EventFilter.setup_event_filter(process, path_name='p', event_filter=True)
+    JMTucker.MFVNeutralino.EventFilter.setup_event_filter(process, path_name='p', event_filter=True, rp_mode=randpars_filter)
 
 if prepare_vis:
     process.load('JMTucker.MFVNeutralino.VertexSelector_cfi')
@@ -210,7 +216,7 @@ if __name__ == '__main__' and hasattr(sys, 'argv') and 'submit' in sys.argv:
             to_replace.append((magic, 'event_filter = False', 'tuple template does not contain the magic string "%s"' % magic))
         return [], to_replace
 
-    modify = chain_modifiers(is_mc_modifier, H_modifier, repro_modifier, event_veto_modifier(skips, 'p'), signals_no_event_filter_modifier)
+    modify = chain_modifiers(is_mc_modifier, H_modifier, repro_modifier, event_veto_modifier(skips, 'p'), signal_uses_random_pars_modifier)
     ms = MetaSubmitter(batch_name)
     if 'validation' in sys.argv:
         modify.append(max_output_modifier(500))

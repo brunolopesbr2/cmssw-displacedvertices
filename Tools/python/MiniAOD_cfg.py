@@ -42,7 +42,7 @@ def pat_tuple_process(customize_before_unscheduled, is_mc, year, H, repro):
     process.source.fileNames = [{
         (2015, True):  '/store/mc/RunIIFall15DR76/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0039E642-58BD-E511-B773-002590DE7230.root',
         (2015, False): '/store/data/Run2015D/JetHT/AOD/16Dec2015-v1/00000/0A2C6696-AEAF-E511-8551-0026189438EB.root',
-        (2016, True):  '/store/user/joeyr/splitSUSY/output_2.root', # note this one is an AOD file, but RECO also would work
+        (2016, True):  '/store/mc/RunIISummer16DR80Premix/StealthSHH_2t6j_mStop-300to1500_mSo-lowandhigh_ctau-0p01to1000_TuneCP5_13TeV-madgraphMLM-pythia8/AODSIM/RPScan_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/2560000/C2530619-568E-EE11-82B0-D85ED3091DB9.root', # note this one is an AOD file, but RECO also would work
         (2016, False): '/store/data/Run2016G/JetHT/AOD/23Sep2016-v1/100000/0006CE1E-9986-E611-8DFB-6C3BE5B5C0B0.root',
         }[(year, is_mc)]]
 
