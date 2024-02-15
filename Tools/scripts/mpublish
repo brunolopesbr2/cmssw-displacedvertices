@@ -85,6 +85,7 @@ for wd in wds:
         if options.dbs:
             try:
                 dbs_files = files_in_dataset(ds, 3)
+                print dbs_files
                 nevents = numevents_in_dataset(ds, 3)
             except RuntimeError:
                 print colors.yellow('problem with dbs for %s, len(dbs_files) = %i and nevents is %r' % (ds, len(dbs_files), nevents))

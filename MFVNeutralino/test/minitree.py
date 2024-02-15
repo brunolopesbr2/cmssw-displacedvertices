@@ -1,7 +1,7 @@
 import sys
 from JMTucker.Tools.BasicAnalyzer_cfg import *
 
-dataset = 'ntuplev27darksectorreview_withgeninfom'
+dataset = 'ntuplev27darksectorreviewm'
 sample_files(process, 'mfv_HtoLLPto4j_tau0p1mm_M1000_100_2016', dataset, 1)
 process.TFileService.fileName = 'minitree.root'
 file_event_from_argv(process)
